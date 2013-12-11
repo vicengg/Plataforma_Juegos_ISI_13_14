@@ -31,9 +31,9 @@ Meteor.publish("games", function() {
 });
 
 // Para cada cliente, publica la lista de partidas del juego en el que abre sesión.
-Meteor.publish("matches", function(current_game_id) {
+Meteor.publish("partidas", function(current_game_id) {
 
-	return Matches.find({"game_id" : current_game_id});	
+	return Partidas.find({"game_id" : current_game_id});	
 
 });
 

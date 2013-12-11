@@ -65,7 +65,7 @@ Template.gamestemp.games=function(){
 
 //Encuentra partidas
 Template.matchestemp.matches = function(){
-	return Matches.find();
+	return Partidas.find();
 }
 
 //Carga mensajes del chat
@@ -85,21 +85,21 @@ Template.gamenametemp.gamename=function(){
 //Carga el título de la partida
 Template.matchnametemp.matchname=function(){
 	var matchName = "None";
-	if(Matches.findOne({_id: Session.get('match_id')})){
-		matchName = Matches.findOne({_id: Session.get('match_id')}).name;
+	if(Partidas.findOne({_id: Session.get('match_id')})){
+		matchName = Partidas.findOne({_id: Session.get('match_id')}).name;
 	};
 	return matchName;
 }
 
 //Carga los jugadores presentes en una partida
 Template.roomplayerstemp.players=function(){	
-	var matches_document = Matches.findOne({_id : Session.get('match_id')});
+	var matches_document = Partidas.findOne({_id : Session.get('match_id')});
 	var players_list;
 	var players_names = [];
 	if(matches_document){
-		players_list = matches_document.players;
+		players_list = matches_document.jugadores;
 		players_list.forEach(function(entry){
-			players_names.push({"name" : entry});
+			players_names.push({"name" : Meteor.users.findOne({_id:entry}).username});
 		});
 	};
 	return players_names;
@@ -120,7 +120,7 @@ Meteor.subscribe("games");
 //Subscripción selectiva a la lista de partidas
 Deps.autorun(function () {
 	var current_game_id = Session.get("game_id")
-	Meteor.subscribe("matches", current_game_id);
+	Meteor.subscribe("partidas", current_game_id);
 });
 
 //Subscripción selectiva a los mensajes de la sala
@@ -381,14 +381,14 @@ Template.matchestemp.events = {
 	'keydown input#match_creator':function(event){
 		if(event.which==13){
 			if ($("#match_creator").val()!=''){
-				Matches.insert({
+				Partidas.insert({
 					name: $("#match_creator").val(),
 					game_id: Session.get("game_id"),
 					created: new Date(),
 					initiated: false,
 					finish: false
 				});
-				var current_match_id = Matches.findOne({name: $("#match_creator").val()})._id;
+				var current_match_id = Partidas.findOne({name: $("#match_creator").val()})._id;
 				Session.set('match_id', current_match_id);
 				$('#matches').hide();
 				$('#roomcontainer').fadeIn();
@@ -396,7 +396,7 @@ Template.matchestemp.events = {
 					$('#aliencontainer').show();
 				else if (Games.findOne({_id :Session.get("game_id")}).name=="Froot_Wars")
 					$('#frootwarscontainer').show();
-				Matches.update({_id : Session.get('match_id')}, {$push: {players: Meteor.userId()}, $inc: {num_players :1}});
+				Partidas.update({_id : Session.get('match_id')},{$push: {players: Meteor.userId()}, $inc: {num_players :1}});
 				$("#match_creator").val('');
 			}
 		}
@@ -404,8 +404,8 @@ Template.matchestemp.events = {
 	// Entramos en una partida
 	'click a.linkmatch':function(event){
 		var lim = Games.findOne({_id : $(this)[0].game_id}).players_max;
-		var no_limit = Matches.findOne({_id : $(this)[0]._id}).num_players < lim;
-		var players_array = Matches.findOne({_id : $(this)[0]._id}).players;
+		var no_limit = Partidas.findOne({_id : $(this)[0]._id}).num_players < lim;
+		var players_array = Partidas.findOne({_id : $(this)[0]._id}).players;
 		var already_into = players_array.indexOf(Meteor.userId()) != -1;
 		if(already_into)
 			console.log("YA ESTABA DENTRO");
@@ -418,7 +418,7 @@ Template.matchestemp.events = {
 			else if (Games.findOne({_id : Session.get('game_id')}).name=="Froot_Wars")
 				$('#frootwarscontainer').show();
 			if(!already_into){
-				Matches.update({_id : Session.get('match_id')}, {$push: {players: Meteor.userId()},$inc: {num_players: 1}});
+				Partidas.update({_id : Session.get('match_id')}, {$push: {players: Meteor.userId()},$inc: {num_players: 1}});
 			}
 		} else {
 			Session.set('match_id', undefined);
@@ -440,12 +440,12 @@ Template.roomgametemp.events = {
 	'click a#exitgame':function(event){
 		var quiter_id = Meteor.userId();
 		var quited_match_id = Session.get('match_id');
-		var players_array = Matches.findOne({_id : quited_match_id}).players;
+		var players_array = Partidas.findOne({_id : quited_match_id}).players;
 		players_array = _.reject(players_array, function(player){ return player == quiter_id; });
-		Matches.update({_id : quited_match_id}, {$set:{players : players_array},$inc: {num_players: -1}});
+		Partidas.update({_id : quited_match_id}, {$set:{players : players_array},$inc: {num_players: -1}});
 
-		if(Matches.findOne({_id : quited_match_id}).num_players == 0){
-			Matches.remove({_id : quited_match_id});
+		if(Partidas.findOne({_id : quited_match_id}).num_players == 0){
+			Partidas.remove({_id : quited_match_id});
 		}
 
 		Session.set('match_id', undefined);
