@@ -12,7 +12,7 @@ Meteor.startup(function () {
 	$('#roomcontainer').hide();
 	$('#aliencontainer').hide();
 	$('#frootwarscontainer').hide();
-	$('#claracassonnecontainer').hide();
+	$('#clarcassonnecontainer').hide();
 });
 
 //Cargo el efecto slider y pestañas
@@ -398,7 +398,7 @@ Template.matchestemp.events = {
 				else if (Games.findOne({_id :Session.get("game_id")}).name=="Froot_Wars")
 					$('#frootwarscontainer').show();
 				else if (Games.findOne({_id :Session.get("game_id")}).name=="Clarcassonne")
-					$('#Clarcassonne').show();
+					$('#clarcassonnecontainer').show();
 				Partidas.update({_id : Session.get('match_id')},{$push: {jugadores: Meteor.userId()},$inc:{num_players :1}});
 				$("#match_creator").val('');
 			}
@@ -420,6 +420,8 @@ Template.matchestemp.events = {
 				$('#aliencontainer').show();
 			else if (Games.findOne({_id : Session.get('game_id')}).name=="Froot_Wars")
 				$('#frootwarscontainer').show();
+			else if (Games.findOne({_id :Session.get("game_id")}).name=="Clarcassonne")
+					$('#clarcassonnecontainer').show();
 			if(!already_into){
 				Partidas.update({_id : Session.get('match_id')}, {$push: {jugadores: Meteor.userId()},$inc: {num_players: 1}});
 			}
@@ -455,7 +457,7 @@ Template.roomgametemp.events = {
 		$('#roomcontainer').hide();
 		$('#aliencontainer').hide();
 		$('#frootwars').hide();
-		$('#claracassonnecontainer').hide();
+		$('#clarcassonnecontainer').hide();
 		$('#matches').fadeIn();
 	}
 };
