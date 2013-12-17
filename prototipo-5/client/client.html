@@ -3,7 +3,10 @@
 </head>
 
 <body>
-        <div id="fb-root"></div>
+
+
+<div id="fb-root"></div>
+        
 <script>(function(d, s, id) {
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
@@ -11,6 +14,9 @@
   js.src = "//connect.facebook.net/es_LA/all.js#xfbml=1";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
+
+
+
 	<div id="div-login-button">{{loginButtons}}</div>
 	<div id="titulo" Size="6">X-ADrian</div>
 	<div class="fb-like" data-href="http://lowerlayers.meteor.com/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
@@ -43,7 +49,7 @@
 			<li><a href="#ranking">Ranking</a></li>
 		</ul>
 		<div id="juegos">{{> gamestemp}} {{> matchestemp}} {{> roomgametemp}}</div>
-		<div id="ranking">Por juegos:{{> gamestemp}} Por Usuarios: {{> userstemp}} </div>
+		<div id="ranking">{{> gamesrankingtemp}}{{> userstemp}} </div>
 	</div>
 </template>
 
@@ -77,11 +83,23 @@
 	</div>
 </template>
 
-<template name="userstemp">
-	<div id="users" >
+<template name="userstemp"> 
+	<div id="users">
+		Por Usuarios:
+		
 		{{# each users}}
-			<a href="#">{{username}}</a>
+			<a href="#" class="linkuserranking">{{username}}</a>
 		{{/each}}
+	</div>
+</template>
+
+<template name="gamesrankingtemp" >
+	<div id="gamesranking">
+		Por juegos:
+		
+		{{# each games}}
+			<a style ="cursor:pointer;text-decoration:underline;" class="linkgameranking">{{name}}</a><br>
+		{{/ each}}
 	</div>
 </template>
 
@@ -119,7 +137,6 @@
 			<a style ="cursor:pointer;text-decoration:underline;" class="linkgame">{{name}}</a><br>
 			<IMG  SRC ={{name}} class="linkgame"><br>
 			<div class="fb-like" data-href="http://localhost:3000" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
-			
 		{{/ each}}
 	</div>
 
@@ -204,7 +221,6 @@
 		{{/each}}
 	</table>
 </template>
-
 
 <template name="listaAmigosOnlineTemp">
 	<div id="listaAmigosOnline">

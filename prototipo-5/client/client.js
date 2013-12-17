@@ -49,14 +49,12 @@ $(document).ready(function() {
 		});
 });
 
+
+////// RELLENAR PLANTILLAS /////////
+
 //Ordena los amigos alfabeticamente
 Template.userstemp.users = function(){
 	return Meteor.users.find({},{sort:{username:1}});
-}
-
-//Encuentra usuarios conectados
-Template.loguserstemp.logusers = function(){
-	return Meteor.users.find({"services.resume.loginTokens" : {$not : []}});
 }
 
 //Encuentra juegos
@@ -64,14 +62,39 @@ Template.gamestemp.games=function(){
 	return Games.find();
 }
 
-//Encuentra partidas
-Template.matchestemp.matches = function(){
-	return Partidas.find();
+//Encuentra juegos para ranking
+Template.gamesrankingtemp.games=function(){
+	return Games.find();
+}
+
+//Mostramos puntuaciones para un juego
+Template.gamesrankingtemp.events = {
+	'click .linkgameranking':function(event){
+		$("#ranking").children().hide();
+	}
+}
+
+// Mostramos puntuaciones para un usuario
+Template.userstemp.events = {
+	'click .linkuserranking':function(event){
+		$("#ranking").children().hide();
+		//console.log(Games.findOne({_id : Session.get('game_id')}).name);//$(this)[0]._id);
+	}
+}
+
+//Encuentra usuarios conectados
+Template.loguserstemp.logusers = function(){
+	return Meteor.users.find({"services.resume.loginTokens" : {$not : []}});
 }
 
 //Carga mensajes del chat
 Template.messagestemp.messages=function(){
 	return Messages.find();
+}
+
+//Encuentra partidas
+Template.matchestemp.matches = function(){
+	return Partidas.find();
 }
 
 //Carga el nombre del juego
@@ -106,6 +129,10 @@ Template.roomplayerstemp.players=function(){
 	return players_names;
 }
 
+
+
+///////////// SUSBSCRIPCIONES ////////////////
+
 //Subscripcion a lista de usuarios
 var usersLoaded = false;
 Meteor.subscribe("users", function () {
@@ -130,6 +157,16 @@ Deps.autorun(function () {
 	Meteor.subscribe("messages", current_match_id);
 });
 
+//Subscripción selectiva a ranking
+/*Deps.autorun(function () {
+	var selected_game_id = Session.get("usuario")
+	var selected_user_id = Session.get("juego")
+	Meteor.subscribe("ranking", selected_game_id, selected_user_id),;
+});*/
+
+
+
+
 //Cambios reactivos de la interfaz
 Deps.autorun(function () {
 
@@ -144,16 +181,7 @@ Deps.autorun(function () {
 	}
 });
 
-
-
-
-
-
-
-
-
-
-//Inserta mensajes del chat
+//Inserta mensajes del chat de sala
 Template.input.events = {
 	'keydown input#message':function(event){
 		if(event.which==13){
@@ -178,12 +206,7 @@ Template.input.events = {
 
 
 
-
-
-
-
-
-
+/////////// CHAT PRIVADO //////////
 
 //Pinta lista de amigos conectados, tiene que ser reactivo porque no esta disponible desde el comienzo
 Deps.autorun(function () {
@@ -209,12 +232,6 @@ Deps.autorun(function () {
 		}	
 	}		
 });
-
-
-
-
-
-
 
 var mychats = new Array();
 //Cada vez que hago click en un amigo conectado se inserta una pestaña de chat
@@ -254,15 +271,6 @@ $(document).on("click", ".closechattab", function() {
 		if (mychats.length==0)
 			$("#chatTabs").hide();
 });
-
-
-
-
-
-
-
-
-
 
 
 
@@ -308,6 +316,7 @@ function searchUsers(user) {
 		$.ambiance({message: "User: " +user+ " not found!", type: "error", fade: false});
 	}
 }
+
 //comprueba si la persona que te quiere agregar es amigo
 function isAmigo (id) {
 	amigos = Meteor.user().amigos;		
@@ -358,15 +367,7 @@ function deleteFriend(idUser,idAborrar) {
 
 
 
-
-
-
-
-
-
-
-
-
+//////// JUEGOS ////////
 
 // Abrimos sesión en uno de los juegos
 Template.gamestemp.events = {
@@ -421,7 +422,7 @@ Template.matchestemp.events = {
 			else if (Games.findOne({_id : Session.get('game_id')}).name=="Froot_Wars")
 				$('#frootwarscontainer').show();
 			else if (Games.findOne({_id :Session.get("game_id")}).name=="Clarcassonne")
-					$('#clarcassonnecontainer').show();
+				$('#clarcassonnecontainer').show();
 			if(!already_into){
 				Partidas.update({_id : Session.get('match_id')}, {$push: {jugadores: Meteor.userId()},$inc: {num_players: 1}});
 			}
@@ -461,15 +462,6 @@ Template.roomgametemp.events = {
 		$('#matches').fadeIn();
 	}
 };
-
-
-
-
-
-
-
-
-
 
 
 
