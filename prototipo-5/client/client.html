@@ -49,7 +49,7 @@
 			<li><a href="#ranking">Ranking</a></li>
 		</ul>
 		<div id="juegos">{{> gamestemp}} {{> matchestemp}} {{> roomgametemp}}</div>
-		<div id="ranking">{{> gamesrankingtemp}}{{> userstemp}} </div>
+		<div id="ranking">{{> gamesrankingtemp}}{{> userstemp}} {{> byuserrankingtemp}}</div>
 	</div>
 </template>
 
@@ -99,6 +99,15 @@
 		
 		{{# each games}}
 			<a style ="cursor:pointer;text-decoration:underline;" class="linkgameranking">{{name}}</a><br>
+		{{/ each}}
+	</div>
+</template>
+
+<template name="byuserrankingtemp">
+	<div id="byuserranking">
+		Juegos:
+		{{# each ranking}}
+			{{game}} {{score}}
 		{{/ each}}
 	</div>
 </template>

@@ -13,6 +13,7 @@ Meteor.startup(function () {
 	$('#aliencontainer').hide();
 	$('#frootwarscontainer').hide();
 	$('#clarcassonnecontainer').hide();
+	$("#byuserranking").hide();
 });
 
 //Cargo el efecto slider y pestañas
@@ -71,6 +72,8 @@ Template.gamesrankingtemp.games=function(){
 Template.gamesrankingtemp.events = {
 	'click .linkgameranking':function(event){
 		$("#ranking").children().hide();
+		$("#ranking").append($(this)[0].name);
+		Session.set('game', $(this)[0].name);
 	}
 }
 
@@ -78,6 +81,9 @@ Template.gamesrankingtemp.events = {
 Template.userstemp.events = {
 	'click .linkuserranking':function(event){
 		$("#ranking").children().hide();
+		$("#ranking").append($(this)[0].username);
+		Session.set('user', $(this)[0].username);
+		$("#byuserranking").fadeIn();
 		//console.log(Games.findOne({_id : Session.get('game_id')}).name);//$(this)[0]._id);
 	}
 }
@@ -129,7 +135,11 @@ Template.roomplayerstemp.players=function(){
 	return players_names;
 }
 
-
+//Carga puntuaciones para usuario
+Template.byuserrankingtemp.ranking=function(){
+	var ranking = Ranking.find({user: Session.get("user")});
+	return ranking;
+}
 
 ///////////// SUSBSCRIPCIONES ////////////////
 
@@ -137,7 +147,6 @@ Template.roomplayerstemp.players=function(){
 var usersLoaded = false;
 Meteor.subscribe("users", function () {
 	usersLoaded = true;
-
 });
 //Subscripcion a lista de mensajes
 Meteor.subscribe("messages");
@@ -158,11 +167,13 @@ Deps.autorun(function () {
 });
 
 //Subscripción selectiva a ranking
-/*Deps.autorun(function () {
-	var selected_game_id = Session.get("usuario")
-	var selected_user_id = Session.get("juego")
-	Meteor.subscribe("ranking", selected_game_id, selected_user_id),;
-});*/
+Deps.autorun(function () {
+	var selected_game_id = Session.get("game")
+	var selected_user_id = Session.get("user")
+	console.log("selectedgame: "+selected_game_id);
+	console.log("selecteduser: "+selected_user_id);
+	Meteor.subscribe("ranking", selected_game_id, selected_user_id);
+});
 
 
 
